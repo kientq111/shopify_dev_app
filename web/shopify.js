@@ -4,9 +4,9 @@ import { SQLiteSessionStorage } from "@shopify/shopify-app-session-storage-sqlit
 import { restResources } from "@shopify/shopify-api/rest/admin/2023-01";
 import sqlite3 from "sqlite3";
 import { join } from "path";
+import { MongoDBSessionStorage } from '@shopify/shopify-app-session-storage-mongodb'
 
-
-const database = new sqlite3.Database(join(process.cwd(), "database.sqlite"));
+// const database = new sqlite3.Database(join(process.cwd(), "database.sqlite"));
 
 // Initialize SQLite DB
 
@@ -24,7 +24,7 @@ const shopify = shopifyApp({
   webhooks: {
     path: "/api/webhooks",
   },
-  sessionStorage: new SQLiteSessionStorage(database),
+  sessionStorage: new MongoDBSessionStorage('mongodb://localhost:27017', 'qrcodes_db'),
 });
 
 

@@ -13,5 +13,5 @@ const productSchema = mongoose.Schema({
     scans:{type:Number, default: 0},
 }, { timestamps: true });
 
-export const Product = mongoose.model('qrcodes', productSchema);
+export const Product = mongoose.model('product', productSchema);
 

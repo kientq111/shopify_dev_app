@@ -9,7 +9,7 @@ import {
   goToProductView,
   generateQrcodeDestinationUrl,
 } from "../helpers/qr-codes.js";
-import { Product } from "../models/qrcodeModel.js";
+import { Product } from "../models/productModel.js";
 import QRCode from "qrcode";
 
 

@@ -1,4 +1,4 @@
-import { Product } from "../models/qrcodeModel.js";
+import { Product } from "../models/productModel.js";
 import shopify from "../shopify.js";
 
 /*
