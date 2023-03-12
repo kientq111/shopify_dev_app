@@ -1,4 +1,4 @@
-import { qrCode } from "../models/qrcodeModel.js";
+import { Product } from "../models/qrcodeModel.js";
 import shopify from "../shopify.js";
 
 /*
@@ -7,6 +7,8 @@ import shopify from "../shopify.js";
   By querying the Shopify GraphQL Admin API at runtime, data can't become stale.
   This data is also queried so that the full state can be saved to the database, in order to generate QR code links.
 */
+const DEFAULT_PURCHASE_QUANTITY = 1;
+
 const QR_CODE_ADMIN_QUERY = `
   query nodes($ids: [ID!]!) {
     nodes(ids: $ids) {
@@ -34,7 +36,7 @@ const QR_CODE_ADMIN_QUERY = `
 //need fixing
 export async function getQrCodeOr404(req, res, checkDomain = true) {
   try {
-    const response = await qrCode.findById(req.params.id)
+    const response = await Product.findById(req.params.id)
     if (
       response === undefined ||
       (checkDomain &&
@@ -50,33 +52,6 @@ export async function getQrCodeOr404(req, res, checkDomain = true) {
 
 
   return undefined;
-}
-
-export async function getShopUrlFromSession(req, res) {
-  return `https://${res.locals.shopify.session.shop}`;
-}
-
-export function goToProductView(url, qrcode) {
-  return productViewURL({
-    discountCode: qrcode.discountCode,
-    host: url.toString(),
-    productHandle: qrcode.handle,
-  });
-}
-
-/* Generate the URL to a product page */
-function productViewURL({ host, productHandle, discountCode }) {
-  const url = new URL(host);
-  const productPath = `/products/${productHandle}`;
-
-  if (discountCode) {
-    url.pathname = `/discount/${discountCode}`;
-    url.searchParams.append("redirect", productPath);
-  } else {
-    url.pathname = productPath;
-  }
-
-  return url.toString();
 }
 
 
@@ -168,7 +143,35 @@ export const generateQrcodeImageUrl = function (qrcode) {
 }
 
 export const increaseQrCode = async (qrcode) => {
-  const product = await qrCode.findById(qrcode._id);
+  const product = await Product.findById(qrcode._id);
   product.scans = product.scans + 1
   await product.save()
 }
+
+export async function getShopUrlFromSession(req, res) {
+  return `https://${res.locals.shopify.session.shop}`;
+}
+
+export function goToProductView(url, qrcode) {
+  return productViewURL({
+    discountCode: qrcode.discountCode,
+    host: url.toString(),
+    productHandle: qrcode.handle,
+  });
+}
+
+/* Generate the URL to a product page */
+function productViewURL({ host, productHandle, discountCode }) {
+  const url = new URL(host);
+  const productPath = `/products/${productHandle}`;
+
+  if (discountCode) {
+    url.pathname = `/discount/${discountCode}`;
+    url.searchParams.append("redirect", productPath);
+  } else {
+    url.pathname = productPath;
+  }
+
+  return url.toString();
+}
+

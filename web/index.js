@@ -5,8 +5,8 @@ import express from "express";
 import serveStatic from "serve-static";
 import shopify from "./shopify.js";
 import GDPRWebhookHandlers from "./gdpr.js";
-import applyQrCodeApiEndpoints from "./middleware/qr-code-api.js";
-import applyQrCodePublicEndpoints from "./middleware/qr-code-public.js";
+import applyQrCodeApiEndpoints from "./routers/qr-code-api.js";
+import applyQrCodePublicEndpoints from "./routers/qr-code-public.js";
 import { connectDB } from "./config/db.js";
 
 

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const qrcodeSchema = mongoose.Schema({
+const productSchema = mongoose.Schema({
     shopDomain: { type: String },
     title: { type: String },
     productId: { type: String},
@@ -13,5 +13,5 @@ const qrcodeSchema = mongoose.Schema({
     scans:{type:Number, default: 0},
 }, { timestamps: true });
 
-export const qrCode = mongoose.model('qrcodes', qrcodeSchema);
+export const Product = mongoose.model('qrcodes', productSchema);
 

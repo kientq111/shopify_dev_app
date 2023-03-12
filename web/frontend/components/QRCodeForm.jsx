@@ -28,7 +28,6 @@ import { useAuthenticatedFetch, useAppQuery } from "../hooks";
 
 /* Import custom hooks for forms */
 import { useForm, useField, notEmptyString } from "@shopify/react-form";
-import { qrCode } from "../../models/qrcodeModel";
 
 
 
