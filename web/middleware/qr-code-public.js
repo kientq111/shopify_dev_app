@@ -5,7 +5,7 @@
 import QRCode from "qrcode";
 
 import shopify from "../shopify.js";
-import { getQrCodeOr404, generateQrcodeDestinationUrl } from "../helpers/qr-codes.js";
+import { getQrCodeOr404, generateQrcodeDestinationUrl, goToProductView, increaseQrCode } from "../helpers/qr-codes.js";
 
 
 export default function applyQrCodePublicEndpoints(app) {
@@ -31,11 +31,11 @@ export default function applyQrCodePublicEndpoints(app) {
 
   /* The URL customers are taken to when they scan the QR code */
   app.get("/qrcodes/:id/scan", async (req, res) => {
-    // const qrcode = await getQrCodeOr404(req, res, false);
-
-    // if (qrcode) {
-    //   res.redirect(await QRCodesDB.handleCodeScan(qrcode));
-    // }
-    console.log(req.params)
+    const qrcode = await getQrCodeOr404(req, res, false);
+    if (qrcode) {
+      const url = new URL(qrcode.shopDomain)
+      await increaseQrCode(qrcode);
+      res.redirect(await goToProductView(url, qrcode))
+    }
   });
 }

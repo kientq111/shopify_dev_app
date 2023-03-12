@@ -39,14 +39,14 @@ export async function getQrCodeOr404(req, res, checkDomain = true) {
       response === undefined ||
       (checkDomain &&
         (await getShopUrlFromSession(req, res)) !== response.shopDomain)
-        ) {
-          res.status(404).send();
-        } else {
-          return response.toJSON();
-        }
-      } catch (error) {
-        res.status(500).send(error.message);
-      }
+    ) {
+      res.status(404).send();
+    } else {
+      return response.toJSON();
+    }
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
 
 
   return undefined;
@@ -55,6 +55,30 @@ export async function getQrCodeOr404(req, res, checkDomain = true) {
 export async function getShopUrlFromSession(req, res) {
   return `https://${res.locals.shopify.session.shop}`;
 }
+
+export function goToProductView(url, qrcode) {
+  return productViewURL({
+    discountCode: qrcode.discountCode,
+    host: url.toString(),
+    productHandle: qrcode.handle,
+  });
+}
+
+/* Generate the URL to a product page */
+function productViewURL({ host, productHandle, discountCode }) {
+  const url = new URL(host);
+  const productPath = `/products/${productHandle}`;
+
+  if (discountCode) {
+    url.pathname = `/discount/${discountCode}`;
+    url.searchParams.append("redirect", productPath);
+  } else {
+    url.pathname = productPath;
+  }
+
+  return url.toString();
+}
+
 
 /*
 Expect body to contain
@@ -103,17 +127,12 @@ export async function formatQrCodeResponse(req, res, rawCodeData) {
   const adminData = await client.query({
     data: {
       query: QR_CODE_ADMIN_QUERY,
-
       /* The IDs that are pulled from the app's database are used to query product, variant and discount information */
       variables: { ids },
     },
   });
 
-  /*
-    Replace the product, discount and variant IDs with the data fetched using the Shopify GraphQL Admin API.
-  */
-
- //compare product server with product admin
+  //compare product server with product admin
   const formattedData = rawCodeData.map((qrCode) => {
     let product = adminData.body.data.nodes.find(
       (node) => qrCode.productId === node?.id
@@ -133,7 +152,7 @@ export async function formatQrCodeResponse(req, res, rawCodeData) {
 
     /* Since product.id already exists, productId isn't required */
     delete formattedQRCode.productId;
-    
+
     return formattedQRCode;
   });
 
@@ -141,11 +160,15 @@ export async function formatQrCodeResponse(req, res, rawCodeData) {
 }
 
 export const generateQrcodeDestinationUrl = function (qrcode) {
-    return `${shopify.api.config.hostScheme}://${shopify.api.config.hostName}/qrcodes/${qrcode._id}/scan`;
-  }
+  return `${shopify.api.config.hostScheme}://${shopify.api.config.hostName}/qrcodes/${qrcode._id}/scan`;
+}
 
-  export const generateQrcodeImageUrl = function (qrcode) {
-    return `${shopify.api.config.hostScheme}://${shopify.api.config.hostName}/qrcodes/${qrcode._id}/image`;
-  }
+export const generateQrcodeImageUrl = function (qrcode) {
+  return `${shopify.api.config.hostScheme}://${shopify.api.config.hostName}/qrcodes/${qrcode._id}/image`;
+}
 
-  
+export const increaseQrCode = async (qrcode) => {
+  const product = await qrCode.findById(qrcode._id);
+  product.scans = product.scans + 1
+  await product.save()
+}
