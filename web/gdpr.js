@@ -80,4 +80,13 @@ export default {
       // }
     },
   },
+
+  APP_UNINSTALLED: {
+    deliveryMethod: DeliveryMethod.Http,
+    callbackUrl: "/api/webhooks",
+    callback: async (topic, shop, body, webhookId) => {
+      const payload = JSON.parse(body);
+      console.log('APP_UNINSTALLED', payload);
+    },
+  },
 };

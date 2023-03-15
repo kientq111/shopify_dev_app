@@ -20,6 +20,8 @@ const STATIC_PATH =
 
 connectDB();
 
+// appUninstallWebhookHandler()
+
 const app = express();
 
 // Set up Shopify authentication and webhook handling
@@ -33,6 +35,7 @@ app.post(
   shopify.config.webhooks.path,
   shopify.processWebhooks({ webhookHandlers: GDPRWebhookHandlers })
 );
+
 
 applyQrCodePublicEndpoints(app);
 
